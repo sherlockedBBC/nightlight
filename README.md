@@ -1,5 +1,5 @@
 # nightlight
-Firmware and 3D Printing Files for a DIY Motion Activated Nightlight in the Style of Legend of Zelda.
+Firmware and 3D printing files for a DIY motionactivated nightlight in the style of Legend of Zelda.
 
 Would i do it another way if i had more time? Yes, definitely. But even without a custom PCB and handsoldered connections this turned out pretty good.
 
@@ -7,24 +7,16 @@ Would i do it another way if i had more time? Yes, definitely. But even without 
 
 ## Instructions
 
-The Different Modes can be selected via the DIP-Switches in the back of the Device.
+The different modes can be selected via the DIP-Switches in the back of the device. In the default setting the rupee shows a random, weighted color when dark enough and motion is detected. After 4 minutes of no motion, the light is turned off.
 
-| DIP 1 | DIP 2 | DIP 3 | Mode                                                                                                                          |
-|-------|-------|-------|-------------------------------------------------------------------------------------------------------------------------------|
-| Down  | Down  | Down  | Random Rupee-Color when Dark and Motion detected. Motion Timeout 4min.                                                        |
-| Up    | Down  | Down  | Random Rupee-Color when Dark and Motion detected. Motion Timeout 1min30sec.                                                   |
-| Down  | Up    | Down  | Random Rupee-Color when Dark and Motion detected. Motion Timeout 8min.                                                        |
-| Up    | Up    | Down  | White Rupee-Color when Dark and Motion detected. Motion Timeout 4min.                                                         |
-| Down  | Down  | Up    | White Rupee-Color when Dark and Motion detected. Motion Timeout 1min30sec.                                                    |
-| Up    | Down  | Up    | White Rupee-Color when Dark and Motion detected. Motion Timeout 8min.                                                         |
-| Down  | Up    | Up    | Random Rupee-Color when Motion detected (Without Lightsensor). Motion Timeout 4min.                                           |
-| Up    | Up    | Up    | Activate Fallback Wifi Hotspot and [Captive Portal](https://esphome.io/components/captive_portal.html) to connect to Wifi.    |
+DIP 1: Changes the Color-Mode from displaying a random rupee color to pure white when switched to the "up"-position.
+DIP 2: Changes the motion timeout from 4 minutes to 8 minutes when switched to the "up"-position.
+DIP 3: Activate Fallback Wifi Hotspot and [Captive Portal](https://esphome.io/components/captive_portal.html) to connect to Wifi when switched to the "up"-position.
 
 ![DIP Switches](Hardware/Images/dip_switches.jpg)
+Image of all DIP Switches in the "down"-position.
 
-Image of all DIP Switches in the "Down"-Position.
-
-The two dails on the bottom of the Housing change the sensitivity and the motion timeout bild into the PIR-Sensor. This timeout is not uses and the firmware uses its own timout! The sensitivity however can be changed id needed.
+The two dails on the bottom of the housing change the sensitivity and the motion timeout bild into the PIR-Sensor. This timeout is not used and the firmware uses its own timout! The sensitivity however can be changed id needed.
 
 ## Firmware
 
