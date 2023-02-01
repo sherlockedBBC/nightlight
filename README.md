@@ -7,20 +7,30 @@ Would i do it another way if i had more time? Yes, definitely. But even without 
 
 ## Instructions
 
-The different modes can be selected via the DIP-Switches in the back of the device. In the default setting the rupee shows a random, weighted color when dark enough and motion is detected. After 4 minutes of no motion, the light is turned off.
+The different modes can be selected via the DIP-Switches in the back of the device. In the default setting the rupee shows a random, weighted color when dark enough and motion is detected. After a set amount of no motion, the light is turned off.
 
 DIP 1: Changes the Color-Mode from displaying a random rupee color to pure white when switched to the "up"-position.
-DIP 2: Changes the motion timeout from 4 minutes to 8 minutes when switched to the "up"-position.
-DIP 3: Activate Fallback Wifi Hotspot and [Captive Portal](https://esphome.io/components/captive_portal.html) to connect to Wifi when switched to the "up"-position.
+DIP 2: Changes the brightness from full brightness to 75% when switched to the "up"-position.
+DIP 3: Overrides the lightsensor when switched to the "up"-position, so the motion sensor turns on the light even it is bright.
 
 ![DIP Switches](Hardware/Images/dip_switches.jpg)
 Image of all DIP Switches in the "down"-position.
 
-The two dails on the bottom of the housing change the sensitivity and the motion timeout bild into the PIR-Sensor. This timeout is not used and the firmware uses its own timout! The sensitivity however can be changed id needed.
+The two dails on the bottom of the housing change the sensitivity and the motion timeout build into the PIR-Sensor. The motion timeout has about 1,5 minutes at midpoint and about 3 minutes at the furthest position (clockwise). Any additional motion during on time resets the counter.
 
 ## Firmware
 
-The Firmware is created in ESPHome. The YAML-File is located in the "Software"-Folder and is intendet for use without a connected HomeAssistant Instance. The different modes can be changed via the DIP-Switches in the Back. The YAML-File can easily be modified to work this for example HomeAssistant.
+The firmware is created in ESPHome. The YAML-File is located in the "Software"-folder and is intendet for use without a connected HomeAssistant Instance. The different modes can be changed via the DIP-Switches in the Back. The YAML-File can easily be modified to work this for example HomeAssistant.
+
+In the color mode the color of the rupee changes randomly with each activation. Which color appears is random and weighted how much the rupee color is worth in the game. Green appears often, gold rarely.
+
+| color  | value | probability |
+|--------|-------|-------------|
+| green  | 1     | 78,53%      |
+| blue   | 5     | 15,71%      |
+| red    | 20    | 3,93%       |
+| purple | 50    | 1,57%       |
+| gold   | 300   | 0,26%       |
 
 ## Hardware
 
@@ -49,7 +59,7 @@ To Screw the four M3 Screws in, i positioned heat-set inserts in the screwholes 
 
 The Backplate is held to the housing by the four M3 Screws. The ESP-M3 Microcontroller as well as the DIP-Switches gets mounted on the backplane. The DIP-Switches are 6.6x2.7x1.4mm SMD Slider Switches from LCSC (C2911519) with carefully soldered wires going from the microcontroller GPIO to ground.
 
-To Flash the Microcontroller the 4-Pin socket on top of the DIP-Switches can be used. From left to right the Pins are: Ground, GPIO0 (Has to be pulled to Ground to boot into Flash-Mode), RX (Goes to TX on Serial Converter) and TX (Goes to RX on Serial Converter).
+To Flash the Microcontroller the 4-Pin socket on top of the DIP-Switches can be used. From left to right the Pins are: Ground, GPIO0 (Has to be pulled to Ground to boot into Flash-Mode), RX (Goes to RX on Serial Converter) and TX (Goes to TX on Serial Converter). Be careful to only use a 3.3V usb to serial adapter. Power while flashing is supplied by the integrated 5W apple charger, so the device must be plugged in while flashing.
 
 To Connect the two sides the 5-Pin socket may be used. From left to right the Pins are: Lightsensor (Orange), PIR-Sensor (Brown), LED-Signal (White), Ground (Black) and +5V (Red).
 

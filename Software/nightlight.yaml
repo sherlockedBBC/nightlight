@@ -1,0 +1,223 @@
+esphome:
+  name: nightlight
+
+esp8266:
+  board: esp8285
+
+# Enable logging
+logger:
+
+#wifi:
+#  ssid: !secret ssid
+#  password: !secret password
+#
+#  # Enable fallback hotspot (captive portal) in case wifi connection fails
+#  ap:
+#    ssid: "Nightlight Fallback Hotspot"
+#    password: "FallbackPassword2023"
+
+#captive_portal:
+
+# Enable Home Assistant API
+#api:
+#  password: !secret api_key
+#  encryption:
+#    key: !secret encryption_key
+
+#ota:
+#  password: !secret ota_key
+
+
+
+binary_sensor:
+  # DIP Switches
+  - platform: gpio
+    pin:
+      number: 4
+      mode:
+        input: true
+        pullup: true
+      inverted: true
+    id: dip_white
+    name: "DIP White"
+    internal: true
+  - platform: gpio
+    pin:
+      number: 12
+      mode:
+        input: true
+        pullup: true
+      inverted: true
+    id: dip_brightness
+    name: "DIP Brightness"
+    internal: true
+  - platform: gpio
+    pin:
+      number: 14
+      mode:
+        input: true
+        pullup: true
+      inverted: true
+    id: dip_lightsensor_override
+    name: "DIP Lightsensor Override"
+    internal: true
+  # Motion Sensor
+  - platform: gpio
+    pin: 2
+    name: "Motionsensor"
+    id: motionsensor
+    device_class: motion
+    internal: true
+    on_press:
+      lambda: !lambda |-
+        if (id(lightsensor).state < 10.0 || id(dip_lightsensor_override).state) {
+          double brightness_factor = 1;
+          if (id(dip_brightness).state) {
+            brightness_factor = 0.75;
+          }
+
+          double rupee_red = 0.0;
+          double rupee_green = 0.0;
+          double rupee_blue = 0.0;
+          double rupee_white = 0.0;
+
+          if (id(dip_white).state) {
+            rupee_red = 0.8;
+            rupee_green = 0.0;
+            rupee_blue = 0.0;
+            rupee_white = 1.0;
+            brightness_factor = brightness_factor * 0.6;
+          }
+          else {
+            float numbers = random_float();
+
+            if(numbers < 0.7853f) {
+              //ESP_LOGE("ZUFALL", "Random Float %f is smaller than 0.7853 -> Display Green", numbers);
+              rupee_red = 0.0;
+              rupee_green = 1.0;
+              rupee_blue = 0.0;
+              rupee_white = 0.0;
+            }
+            else if(numbers < 0.9424f) {
+              //ESP_LOGE("ZUFALL", "Random Float %f is between 0.7853 and 0.9424 -> Display Blue", numbers);
+              rupee_red = 0.0;
+              rupee_green = 0.0;
+              rupee_blue = 1.0;
+              rupee_white = 0.0;
+            }
+            else if(numbers < 0.9817f) {
+              //ESP_LOGE("ZUFALL", "Random Float %f is between 0.9424 and 0.9817 -> Display Red", numbers);
+              rupee_red = 1.0;
+              rupee_green = 0.0;
+              rupee_blue = 0.0;
+              rupee_white = 0.0;
+            }
+            else if(numbers < 0.9974f) {
+              //ESP_LOGE("ZUFALL", "Random Float %f is between 0.9817 and 0.9974 -> Display Purple", numbers);
+              rupee_red = 0.5;
+              rupee_green = 0.0;
+              rupee_blue = 0.5;
+              rupee_white = 0.0;
+            }
+            else {
+              //ESP_LOGE("ZUFALL", "Random Float %f is greater than 0.9974 -> Display Gold", numbers);
+              rupee_red = 1.0;
+              rupee_green = 0.84;
+              rupee_blue = 0.0;
+              rupee_white = 0.0;
+            }
+          }
+
+          auto call = id(light_rupee_front).turn_on();
+          call.set_brightness(0.8*brightness_factor);
+          call.set_rgb(rupee_red, rupee_green, rupee_blue);
+          call.set_white(rupee_white);
+          call.perform();
+          call = id(light_rupee_back).turn_on();
+          call.set_brightness(1.0*brightness_factor);
+          call.set_rgb(rupee_red, rupee_green, rupee_blue);
+          call.set_white(rupee_white);
+          call.perform();
+
+          call = id(light_triforce).turn_on();
+          call.set_brightness(brightness_factor);
+          call.set_rgb(1.0, 0.84, 0.0);
+          call.set_white(0.0);
+          call.perform();
+
+        }
+    on_release:
+      then:
+        - light.turn_off:
+            id: light_rupee_front
+        - light.turn_off:
+            id: light_rupee_back
+        - light.turn_off:
+            id: light_triforce
+
+# Light Sensor
+sensor:
+  - platform: adc
+    pin: A0
+    name: "Lightsensor"
+    id: lightsensor
+    update_interval: 0.1s
+    device_class: illuminance
+    unit_of_measurement: lx
+    internal: true
+    filters:
+      - lambda: |-
+          return (x / 10000.0) * 2000000.0;
+      - sliding_window_moving_average:
+          window_size: 15
+          send_every: 5
+
+
+# Neopixel Lights
+light:
+  - platform: neopixelbus
+    type: GRBW
+    variant: SK6812
+    pin: 3
+    method: ESP8266_DMA
+    num_leds: 16
+    id: ledstrip
+    internal: true
+  - platform: partition
+    name: "Rupee Back"
+    id: light_rupee_back
+    restore_mode: ALWAYS_OFF
+    segments:
+      - id: ledstrip
+        from: 0
+        to: 5
+    internal: true
+  - platform: partition
+    name: "Rupee Front"
+    id: light_rupee_front
+    restore_mode: ALWAYS_OFF
+    segments:
+      - id: ledstrip
+        from: 6
+        to: 11
+    internal: true
+  - platform: partition
+    name: "Triforce"
+    id: light_triforce
+    segments:
+      - id: ledstrip
+        from: 12
+        to: 13
+    internal: true
+    restore_mode: ALWAYS_ON
+    on_turn_on:
+      lambda: !lambda |-
+        double brightness_factor = 1;
+        if (id(dip_brightness).state) {
+          brightness_factor = 0.75;
+        }
+        auto call = id(light_triforce).turn_on();
+        call.set_brightness(brightness_factor);
+        call.set_rgb(1.0, 0.84, 0.0);
+        call.set_white(0.0);
+        call.perform();
