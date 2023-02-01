@@ -9,9 +9,9 @@ Would i do it another way if i had more time? Yes, definitely. But even without 
 
 The different modes can be selected via the DIP-Switches in the back of the device. In the default setting the rupee shows a random, weighted color when dark enough and motion is detected. After a set amount of no motion, the light is turned off.
 
-DIP 1: Changes the Color-Mode from displaying a random rupee color to pure white when switched to the "up"-position.
-DIP 2: Changes the brightness from full brightness to 75% when switched to the "up"-position.
-DIP 3: Overrides the lightsensor when switched to the "up"-position, so the motion sensor turns on the light even it is bright.
+- DIP 1: Changes the Color-Mode from displaying a random rupee color to pure white when switched to the "up"-position.
+- DIP 2: Changes the brightness from full brightness to 75% when switched to the "up"-position.
+- DIP 3: Overrides the lightsensor when switched to the "up"-position, so the motion sensor turns on the light even it is bright.
 
 ![DIP Switches](Hardware/Images/dip_switches.jpg)
 Image of all DIP Switches in the "down"-position.
